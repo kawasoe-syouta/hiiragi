@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+
+# ビルド成果物・依存
+.next/
+node_modules/
+
+# 別リポジトリ（kawasoe-syouta/hiiragi-portfolio-site）で管理
+hiiragi-portfolio-site/
