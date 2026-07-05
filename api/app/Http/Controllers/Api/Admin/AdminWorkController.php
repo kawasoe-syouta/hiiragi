@@ -18,7 +18,7 @@ class AdminWorkController extends Controller
             'image' => ['required', 'image', 'max:4096'],
         ]);
 
-        $data['image_path'] = $request->file('image')->store('works', 'public');
+        $data['image_path'] = $this->storeImage($request);
         $data['sort_order'] = (int) Work::max('sort_order') + 1;
         unset($data['image']);
 
@@ -36,7 +36,7 @@ class AdminWorkController extends Controller
 
         if ($request->hasFile('image')) {
             $this->deleteImage($work);
-            $data['image_path'] = $request->file('image')->store('works', 'public');
+            $data['image_path'] = $this->storeImage($request);
         }
         unset($data['image']);
         $work->update($data);
@@ -61,6 +61,18 @@ class AdminWorkController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    private function storeImage(Request $request): string
+    {
+        $path = $request->file('image')->store('works', 'public');
+        if ($path === false) {
+            // 書き込み失敗時に false のまま保存すると image_path が「0」になり
+            // 画像リンクが静かに壊れるため、ここで明示的にエラーにする
+            abort(500, '画像の保存に失敗しました。storage ディレクトリの書き込み権限を確認してください。');
+        }
+
+        return $path;
     }
 
     private function deleteImage(Work $work): void
